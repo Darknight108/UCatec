@@ -16,67 +16,49 @@ Antes de comenzar, asegúrate de tener lo siguiente instalado:
 Este archivo define los servicios de PostgreSQL, MongoDB y Nginx.
 
 ```yaml
-version: '3.9'
+version: '3.8'
 
 services:
   postgres:
     image: postgres:15
-    container_name: postgres-local
+    container_name: postgres
+    restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: demo_db
+      POSTGRES_DB: examen_db
     ports:
       - "5432:5432"
     volumes:
-      - ./init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: always
+      - postgres_data:/var/lib/postgresql/data
 
-  mongo:
+  mongodb:
     image: mongo:6
-    container_name: mongo-local
+    container_name: mongodb
+    restart: always
     ports:
       - "27017:27017"
     volumes:
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
-    restart: always
+      - mongo_data:/data/db
 
   nginx:
     image: nginx:latest
-    container_name: nginx-local
+    container_name: nginx
+    restart: always
     ports:
       - "8080:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    restart: always
+      - ./html:/usr/share/nginx/html:ro
+
+volumes:
+  postgres_data:
+  mongo_data:
 ```
 
 ---
 
 ## ⚙️ Paso 2: Crear archivos de inicialización
-
-### `init-postgres.sql` – Inicializa una tabla en PostgreSQL
-
-```sql
-CREATE TABLE personas (
-  id SERIAL PRIMARY KEY,
-  nombre VARCHAR(50),
-  edad INTEGER
-);
-
-INSERT INTO personas (nombre, edad) VALUES ('Ana Lopez', 28);
-```
-
-### `init-mongo.js` – Inicializa una colección en MongoDB
-
-```javascript
-db = db.getSiblingDB('demo_db');
-
-db.usuarios.insertOne({
-  nombre: "Carlos García",
-  edad: 32
-});
-```
 
 ### `nginx/default.conf` – Configuración básica para Nginx
 
@@ -101,23 +83,28 @@ Abre la terminal en la carpeta del proyecto y ejecuta:
 docker-compose up -d
 ```
 
-📸 ![Levantando servicios](img1.png)
+![Levantando servicios](images/img1.png)
 
 ---
 
 ## 🧪 Paso 4: Verificar los servicios
 
 ### PostgreSQL
+ejecuta este comando para ingresar a postgres
 
-Conéctate con un cliente como DBeaver o TablePlus:
+```bash
+docker exec -it postgres psql -U admin -d examen_db
+```
+crea una tabla:
 
-| Campo         | Valor        |
-|---------------|--------------|
-| Host          | localhost    |
-| Puerto        | 5432         |
-| Usuario       | admin        |
-| Contraseña    | admin123     |
-| Base de Datos | demo_db      |
+```sql
+ create table personas (id serial primary key, nombre varchar(50), edad integer);
+```
+inserta datos:
+
+```sql
+insert into personas (nombre, edad) values ('ana lopez', 28);
+```
 
 Consulta la tabla:
 
@@ -125,7 +112,7 @@ Consulta la tabla:
 SELECT * FROM personas;
 ```
 
-📸 ![Consulta PostgreSQL](imagenes/postgres-tabla.png)
+![Consulta PostgreSQL](images/img3.png)
 
 ---
 
@@ -143,9 +130,6 @@ Y consulta la colección:
 use demo_db;
 db.usuarios.find();
 ```
-
-📸 ![Consulta MongoDB](imagenes/mongo-coleccion.png)
-
 ---
 
 ### Nginx
@@ -158,11 +142,8 @@ http://localhost:8080
 
 Deberías ver:
 
-```
-Servidor NGINX funcionando 🚀
-```
 
-📸 ![Nginx funcionando](imagenes/nginx.png)
+![Nginx funcionando](images/img2.png)
 
 ---
 

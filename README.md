@@ -118,18 +118,46 @@ SELECT * FROM personas;
 
 ### MongoDB
 
-Conéctate con MongoDB Compass o en terminal:
+ejecuta este comando para ingresar a mongo
 
 ```bash
-docker exec -it mongo-local mongosh
+docker exec -it mongodb mongosh
 ```
 
-Y consulta la colección:
+crea una base de datos:
 
 ```javascript
-use demo_db;
-db.usuarios.find();
+use examen_db
 ```
+
+crea una coleccion:
+
+```javascript
+ db.usuarios.insertOne({
+  nombre: "Juan Pérez",
+  edad: 30,
+  email: "juan@example.com"
+})
+
+```
+inserta datos:
+
+```javascript
+db.usuarios.insertMany([
+  { nombre: "Ana López", edad: 28 },
+  { nombre: "Carlos Gómez", edad: 35 }
+])
+
+```
+
+Consulta la datos:
+
+```javascript
+db.usuarios.find()
+```
+
+![Consulta Mongo](images/img4.png)
+
 ---
 
 ### Nginx

@@ -156,7 +156,7 @@ Consulta la datos:
 db.usuarios.find()
 ```
 
-![Consulta Mongo](images/img4.png)
+![Consulta Mongo](images/mg4.png)
 
 ---
 
